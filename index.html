@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Generator</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --background: #f4f7fb;
+            --card: #ffffff;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #dbe3ef;
+            --accent: #4969e8;
+            --accent-dark: #3452c5;
+            --success: #15803d;
+            --success-background: #dcfce7;
+            --warning: #a16207;
+            --warning-background: #fef9c3;
+            --danger: #b91c1c;
+            --danger-background: #fee2e2;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            align-items: center;
+            background: linear-gradient(135deg, #eef2ff, var(--background));
+            color: var(--text);
+            display: flex;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            justify-content: center;
+            margin: 0;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(219, 227, 239, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(40, 55, 90, 0.12);
+            max-width: 560px;
+            padding: 32px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: clamp(1.7rem, 4vw, 2.2rem);
+            margin: 0 0 8px;
+        }
+
+        .intro {
+            color: var(--muted);
+            margin: 0 0 28px;
+        }
+
+        .field {
+            margin-bottom: 22px;
+        }
+
+        .field-header {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        label,
+        legend {
+            font-size: 0.95rem;
+            font-weight: 650;
+        }
+
+        output {
+            color: var(--accent-dark);
+            font-weight: 750;
+        }
+
+        input[type="range"] {
+            accent-color: var(--accent);
+            cursor: pointer;
+            width: 100%;
+        }
+
+        select,
+        input[readonly] {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font: inherit;
+            padding: 11px 12px;
+            width: 100%;
+        }
+
+        select:focus,
+        input:focus,
+        button:focus-visible {
+            outline: 3px solid rgba(73, 105, 232, 0.25);
+            outline-offset: 2px;
+        }
+
+        fieldset {
+            border: 0;
+            margin: 0 0 24px;
+            padding: 0;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: repeat(3, 1fr);
+            margin-top: 12px;
+        }
+
+        .check-option {
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            font-size: 0.9rem;
+            gap: 8px;
+            padding: 10px;
+        }
+
+        .check-option input {
+            accent-color: var(--accent);
+        }
+
+        button {
+            border: 0;
+            border-radius: 10px;
+            cursor: pointer;
+            font: inherit;
+            font-weight: 700;
+            padding: 12px 18px;
+            transition: background 0.15s ease, transform 0.15s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .generate-button {
+            background: var(--accent);
+            color: white;
+            width: 100%;
+        }
+
+        .generate-button:hover {
+            background: var(--accent-dark);
+        }
+
+        .generate-button:disabled {
+            cursor: wait;
+            opacity: 0.65;
+            transform: none;
+        }
+
+        .result {
+            border-top: 1px solid var(--border);
+            margin-top: 28px;
+            padding-top: 26px;
+        }
+
+        .password-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .password-row input {
+            font-family: "SFMono-Regular", Consolas, monospace;
+        }
+
+        .copy-button {
+            background: #e8edff;
+            color: var(--accent-dark);
+            white-space: nowrap;
+        }
+
+        .copy-button:hover {
+            background: #dbe3ff;
+        }
+
+        .status-row {
+            align-items: center;
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .badge {
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 750;
+            padding: 5px 11px;
+        }
+
+        .badge.strong {
+            background: var(--success-background);
+            color: var(--success);
+        }
+
+        .badge.fair {
+            background: var(--warning-background);
+            color: var(--warning);
+        }
+
+        .badge.weak {
+            background: var(--danger-background);
+            color: var(--danger);
+        }
+
+        .entropy {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .failed-rules {
+            color: var(--danger);
+            font-size: 0.88rem;
+            margin: 12px 0 0;
+            padding-left: 20px;
+        }
+
+        .message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin: 14px 0 0;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 24px 20px;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <h1>Password Generator</h1>
+        <p class="intro">Create a secure password with the character types and strength you need.</p>
+
+        <form id="generator-form">
+            <div class="field">
+                <div class="field-header">
+                    <label for="length">Password length</label>
+                    <output id="length-value" for="length">16</output>
+                </div>
+                <input id="length" name="length" type="range" min="8" max="64" value="16">
+            </div>
+
+            <div class="field">
+                <label for="tier">Security tier</label>
+                <select id="tier" name="tier">
+                    <option value="basic">Basic</option>
+                    <option value="standard" selected>Standard</option>
+                    <option value="paranoid">Paranoid</option>
+                </select>
+            </div>
+
+            <fieldset>
+                <legend>Include character types</legend>
+                <div class="options">
+                    <label class="check-option">
+                        <input id="include-uppercase" name="includeUppercase" type="checkbox" checked>
+                        Uppercase
+                    </label>
+                    <label class="check-option">
+                        <input id="include-numbers" name="includeNumbers" type="checkbox" checked>
+                        Numbers
+                    </label>
+                    <label class="check-option">
+                        <input id="include-symbols" name="includeSymbols" type="checkbox" checked>
+                        Symbols
+                    </label>
+                </div>
+            </fieldset>
+
+            <button class="generate-button" id="generate-button" type="submit">Generate password</button>
+            <p class="message" id="message" role="alert" hidden></p>
+        </form>
+
+        <section class="result" aria-live="polite">
+            <label for="password">Generated password</label>
+            <div class="password-row">
+                <input id="password" type="text" readonly placeholder="Your password will appear here">
+                <button class="copy-button" id="copy-button" type="button">Copy</button>
+            </div>
+            <div class="status-row">
+                <span class="badge weak" id="strength-badge">Not generated</span>
+                <span class="entropy" id="entropy">Entropy: -- bits</span>
+            </div>
+            <ul class="failed-rules" id="failed-rules" hidden></ul>
+        </section>
+    </main>
+
+    <script>
+        const LAMBDA_FUNCTION_URL = "YOUR_LAMBDA_FUNCTION_URL";
+
+        const form = document.getElementById("generator-form");
+        const lengthInput = document.getElementById("length");
+        const lengthValue = document.getElementById("length-value");
+        const generateButton = document.getElementById("generate-button");
+        const passwordInput = document.getElementById("password");
+        const copyButton = document.getElementById("copy-button");
+        const strengthBadge = document.getElementById("strength-badge");
+        const entropyNote = document.getElementById("entropy");
+        const failedRules = document.getElementById("failed-rules");
+        const message = document.getElementById("message");
+
+        lengthInput.addEventListener("input", () => {
+            lengthValue.value = lengthInput.value;
+            lengthValue.textContent = lengthInput.value;
+        });
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            message.hidden = true;
+            generateButton.disabled = true;
+            generateButton.textContent = "Generating...";
+
+            const request = {
+                length: Number(lengthInput.value),
+                tier: document.getElementById("tier").value,
+                includeUppercase: document.getElementById("include-uppercase").checked,
+                includeNumbers: document.getElementById("include-numbers").checked,
+                includeSymbols: document.getElementById("include-symbols").checked
+            };
+
+            try {
+                const response = await fetch(LAMBDA_FUNCTION_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(request)
+                });
+
+                const responseBody = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(responseBody);
+                } catch {
+                    throw new Error(responseBody || `Request failed with status ${response.status}`);
+                }
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Unable to generate a password.");
+                }
+
+                renderResult(result);
+            } catch (error) {
+                message.textContent = error.message || "Unable to generate a password.";
+                message.hidden = false;
+            } finally {
+                generateButton.disabled = false;
+                generateButton.textContent = "Generate password";
+            }
+        });
+
+        copyButton.addEventListener("click", async () => {
+            if (!passwordInput.value) {
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(passwordInput.value);
+                copyButton.textContent = "Copied";
+                window.setTimeout(() => {
+                    copyButton.textContent = "Copy";
+                }, 1500);
+            } catch {
+                message.textContent = "Unable to copy the password.";
+                message.hidden = false;
+            }
+        });
+
+        function renderResult(result) {
+            passwordInput.value = result.password || "";
+            strengthBadge.textContent = result.strengthLabel || "Unknown";
+            strengthBadge.className = `badge ${strengthClass(result.strengthLabel)}`;
+            entropyNote.textContent = `Entropy: ${Number(result.entropyBits || 0).toFixed(1)} bits`;
+
+            failedRules.replaceChildren();
+            const rules = Array.isArray(result.failedRules) ? result.failedRules : [];
+            failedRules.hidden = rules.length === 0;
+            rules.forEach((rule) => {
+                const item = document.createElement("li");
+                item.textContent = rule;
+                failedRules.appendChild(item);
+            });
+        }
+
+        function strengthClass(label) {
+            if (label === "Strong" || label === "Very Strong") {
+                return "strong";
+            }
+            if (label === "Fair") {
+                return "fair";
+            }
+            return "weak";
+        }
+    </script>
+</body>
+</html>
