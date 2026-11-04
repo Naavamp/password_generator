@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class PasswordGeneratorHandler
         implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
+    // Allow browser clients from any origin to send JSON requests and handle preflight checks.
     private static final Map<String, String> CORS_HEADERS = Map.of(
             "Access-Control-Allow-Origin", "*",
             "Access-Control-Allow-Headers", "Content-Type",
