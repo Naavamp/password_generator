@@ -24,6 +24,18 @@ Upload `build/libs/password_generator-1.0-SNAPSHOT.jar` to an AWS Lambda functio
 
 To use the browser interface, replace `YOUR_LAMBDA_FUNCTION_URL` in `index.html` with the Lambda Function URL, then open `index.html` in a browser.
 
+## Test the deployed Lambda from the command line
+
+The repository includes a sample `request.json` file. From the project directory, send it as a `POST` request to the deployed Lambda Function URL. Replace the URL below with your own:
+
+```powershell
+curl.exe -i -X POST "https://5ovcjletwzrb7p2vsv6pzn4q3u0fjqyv.lambda-url.us-east-2.on.aws/" `
+  -H "Content-Type: application/json" `
+  --data-binary "@request.json"
+```
+
+The response should contain the generated password, its strength label, entropy, and any failed strength rules.
+
 ## Imports
 
 - `java.security.SecureRandom` provides cryptographically stronger random character selection for generated passwords.
