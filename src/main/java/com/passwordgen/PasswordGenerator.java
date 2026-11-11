@@ -1,12 +1,15 @@
 package com.passwordgen;
 
 import java.security.SecureRandom;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PasswordGenerator {
     private static final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String NUMBERS = "0123456789";
     private static final String SYMBOLS = "!@#$%^&*()-_=+[]{}|;:,.<>?";
+    private static final Logger LOGGER = Logger.getLogger(PasswordGenerator.class.getName());
 
     private final SecureRandom secureRandom;
 
@@ -18,6 +21,18 @@ public class PasswordGenerator {
         if (request == null) {
             throw new IllegalArgumentException("Password request must not be null");
         }
+
+        LOGGER.log(
+                Level.INFO,
+                "Generating password with parameters: length={0}, tier={1}, includeUppercase={2}, "
+                        + "includeNumbers={3}, includeSymbols={4}",
+                new Object[] {
+                    request.getLength(),
+                    request.getTier(),
+                    request.isIncludeUppercase(),
+                    request.isIncludeNumbers(),
+                    request.isIncludeSymbols()
+                });
 
         int length = Math.max(request.getLength(), minimumLengthFor(request.getTier()));
         String characterPool = buildCharacterPool(request);
